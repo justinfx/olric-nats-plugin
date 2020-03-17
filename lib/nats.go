@@ -1,3 +1,7 @@
+/*
+A service discovery library for use with Olric distributed cache.
+Provides Nats.io service discovery for use with a standalone, embedded, or clustered v2 nats-server.
+*/
 package lib
 
 import (
