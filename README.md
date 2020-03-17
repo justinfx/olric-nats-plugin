@@ -95,4 +95,4 @@ sd["plugin"] = &NatsDiscovery{
 
 ## License
 
-MIT - see LICENSE for more details.
+MIT - see [LICENSE](LICENSE) for more details.
