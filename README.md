@@ -1,5 +1,7 @@
 # olric-nats-plugin
 
+[![GoDoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/justinfx/olric-nats-plugin/lib)
+
 A plugin / service discovery library for use with [Olric](https://github.com/buraksezer/olric/)
 distributed cache.
 
