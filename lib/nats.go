@@ -30,7 +30,7 @@ const (
 
 // MapConfig is a map-based configuration that can be
 // passed to SetConfig
-type MapConfig map[string]interface{}
+type MapConfig = map[string]interface{}
 
 // Configuration options to use when creating a client
 // connection to a nats server, and sending service
