@@ -177,6 +177,28 @@ func TestInitialize(t *testing.T) {
 				expectTimeout, sd.Config.DiscoveryTimeout)
 		}
 	})
+
+	t.Run("config reset", func(t *testing.T) {
+		expect := "addr:1234"
+		sd := NatsDiscovery{Config: &Config{Url: expect}}
+		if err := sd.SetConfig(MapConfig{}); err != nil {
+			t.Fatal(err)
+		}
+		if sd.Config.Url != expect {
+			t.Fatalf("expected %q, got %q", expect, sd.Config.Url)
+		}
+
+		if err := sd.SetConfig(MapConfig{"subject": "foo"}); err != nil {
+			t.Fatal(err)
+		}
+		if sd.Config.Url != expect {
+			t.Fatalf("expected %q, got %q", expect, sd.Config.Url)
+		}
+		expect = "foo"
+		if sd.Config.Subject != expect {
+			t.Fatalf("expectec %q, got %q", expect, sd.Config.Subject)
+		}
+	})
 }
 
 func TestDiscover(t *testing.T) {

@@ -154,9 +154,24 @@ func (n *NatsDiscovery) Initialize() error {
 	opts.ReconnectWait = 2 * time.Second
 	opts.MaxReconnect = -1 // Keep trying forever
 
-	conn, err := opts.Connect()
-	if err != nil {
-		return fmt.Errorf("nats server connection failure: %w", err)
+	var (
+		conn *nats.Conn
+		err error
+	)
+	const N = 3
+	for i := 1;;i++ {
+		conn, err = opts.Connect()
+		if err != nil {
+			if i <= N {
+				n.log.Printf("[WARN] nats server connection failure %d/%d; " +
+					"retrying in %s", i, N, opts.ReconnectWait)
+				time.Sleep(opts.ReconnectWait)
+				continue
+			}
+			return fmt.Errorf("nats server connection failure: %w", err)
+		}
+		break
+
 	}
 
 	enc, err := nats.NewEncodedConn(conn, nats.JSON_ENCODER)
@@ -170,7 +185,13 @@ func (n *NatsDiscovery) Initialize() error {
 
 // SetConfig registers plugin configuration
 func (n *NatsDiscovery) SetConfig(c MapConfig) error {
-	var cfg Config
+	if n.Config == nil {
+		n.Config = &Config{}
+	}
+
+	if len(c) == 0 {
+		return nil
+	}
 
 	dec, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		DecodeHook: func(src, tgt reflect.Type, val interface{}) (interface{}, error) {
@@ -182,17 +203,12 @@ func (n *NatsDiscovery) SetConfig(c MapConfig) error {
 			}
 			return time.ParseDuration(val.(string))
 		},
-		Result: &cfg,
+		Result: n.Config,
 	})
 	if err != nil {
 		return err
 	}
-
-	if err = dec.Decode(c); err != nil {
-		return err
-	}
-	n.Config = &cfg
-	return nil
+	return dec.Decode(c)
 }
 
 // SetLogger sets a custom logger instance
